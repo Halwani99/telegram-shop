@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>الفئات</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mays Accessories</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<h1>🛍 الفئات</h1>
-<div id="categories" class="grid"></div>
+<h1>🛍 Mays Accessories</h1>
 
-<a class="checkout-btn" href="checkout.html">🛒 إتمام الطلب</a>
+<div id="categories"></div>
+
+<div id="products-container"></div>
+
+<div id="cart">
+<h2>سلتك</h2>
+<div id="cart-items"></div>
+<p id="total">المجموع: 0 ل.س</p>
+
+<h3>بيانات الشحن</h3>
+<input id="name" placeholder="الاسم">
+<input id="phone" placeholder="الهاتف">
+<input id="address" placeholder="العنوان">
+<button onclick="sendOrder()">إرسال الطلب</button>
+</div>
 
 <script src="script.js"></script>
-<script src="https://telegram.org/js/telegram-web-app.js"></script>
 </body>
 </html>
