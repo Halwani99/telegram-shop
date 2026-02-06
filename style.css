@@ -31,3 +31,18 @@ body {
   padding: 10px;
   text-decoration: none;
 }
+.qty {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+}
+.qty button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #0088cc;
+  color: white;
+  font-size: 18px;
+  border-radius: 50%;
+}
