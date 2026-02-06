@@ -1,15 +1,114 @@
-body { font-family: Arial, sans-serif; background:#f8f8f8; margin:0; padding:10px; }
-header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#673AB7; color:#fff; border-radius:8px; }
-#cart-icon { cursor:pointer; font-size:24px; position:relative; }
-#cart-count { background:#FF5722; border-radius:50%; padding:2px 6px; position:absolute; top:-8px; right:-8px; font-size:14px; }
-#search-bar input { width:100%; padding:10px; margin:10px 0; border-radius:8px; border:1px solid #ccc; }
-.product { background:#fff; margin:10px 0; padding:10px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; align-items:center; }
-.product img { width:100%; border-radius:8px; }
-.product button { background:#673AB7; color:#fff; border:none; border-radius:5px; padding:8px 12px; margin:5px; cursor:pointer; }
-.product button:hover { opacity:0.9; }
-#cart-overlay, #checkout-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:#fff; overflow:auto; padding:20px; box-sizing:border-box; }
-#cart-overlay h2, #checkout-overlay h2 { color:#FFEB3B; text-align:center; }
-#cart-items div { display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #fff; }
-#cart-items div button { background:#FF5722; margin:0; }
-#checkout-overlay input, #checkout-overlay select { width:100%; padding:10px; margin:5px 0; border-radius:5px; border:none; }
-#checkout-overlay button { background:#4CAF50; margin:5px 0; padding:10px; border:none; border-radius:5px; cursor:pointer; width:100%; font-size:16px; }
+const tg = window.Telegram.WebApp;
+
+const products = [
+  {id:1, name:"خاتم فاخر", price:"100,000 ل.س", image:"https://via.placeholder.com/200"},
+  {id:2, name:"سوار نسائي", price:"50,000 ل.س", image:"https://via.placeholder.com/200"},
+  {id:3, name:"عقد أسود", price:"75,000 ل.س", image:"https://via.placeholder.com/200"},
+  {id:4, name:"ساعة أنيقة", price:"200,000 ل.س", image:"https://via.placeholder.com/200"}
+];
+
+let cart = [];
+
+function renderProducts() {
+  const container = document.getElementById("products-container");
+  container.innerHTML = "";
+  products.forEach(p=>{
+    const div = document.createElement("div");
+    div.className="product";
+    div.innerHTML = `
+      <img src="${p.image}" />
+      <strong>${p.name}</strong>
+      <p>${p.price}</p>
+      <div>
+        <button onclick="decrease(${p.id})">-</button>
+        <span id="qty-${p.id}">0</span>
+        <button onclick="increase(${p.id})">+</button>
+      </div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function increase(id){
+  let item = cart.find(i=>i.id===id);
+  if(!item){ 
+    const prod = products.find(p=>p.id===id); 
+    cart.push({...prod, qty:1});
+  } else { item.qty++; }
+  updateQty(id);
+  updateCartCount();
+}
+
+function decrease(id){
+  let item = cart.find(i=>i.id===id);
+  if(item){
+    item.qty--;
+    if(item.qty<=0) cart = cart.filter(i=>i.id!==id);
+    updateQty(id);
+    updateCartCount();
+  }
+}
+
+function updateQty(id){
+  const item = cart.find(i=>i.id===id);
+  document.getElementById(`qty-${id}`).innerText = item ? item.qty : 0;
+}
+
+function updateCartCount(){
+  const total = cart.reduce((sum,i)=>sum+i.qty,0);
+  document.getElementById("cart-count").innerText = total;
+}
+
+function toggleCart(){
+  document.getElementById("cart-overlay").style.display = 
+    document.getElementById("cart-overlay").style.display==="none" ? "block":"none";
+  renderCart();
+}
+
+function renderCart(){
+  const container = document.getElementById("cart-items");
+  container.innerHTML="";
+  cart.forEach(i=>{
+    const div = document.createElement("div");
+    div.innerHTML=`${i.name} x${i.qty} - ${i.price} <button onclick="removeFromCart(${i.id})">❌</button>`;
+    container.appendChild(div);
+  });
+  const total = cart.reduce((sum,i)=>sum+i.qty*parseInt(i.price.replace(/,/g,"").replace(" ل.س","")),0);
+  document.getElementById("cart-total").innerText = `المجموع: ${total.toLocaleString()} ل.س`;
+}
+
+function removeFromCart(id){
+  cart = cart.filter(i=>i.id!==id);
+  renderCart(); updateCartCount(); updateQty(id);
+}
+
+function checkout(){
+  if(cart.length===0){ alert("السلة فارغة"); return; }
+  document.getElementById("checkout-overlay").style.display="block";
+  toggleCart();
+}
+
+function toggleCheckout(){
+  document.getElementById("checkout-overlay").style.display=
+    document.getElementById("checkout-overlay").style.display==="none" ? "block":"none";
+}
+
+function sendOrder(){
+  const name = document.getElementById("name").value;
+  const city = document.getElementById("city").value;
+  const address = document.getElementById("address").value;
+  const phone = document.getElementById("phone").value;
+  if(!name || !city || !address || !phone){ alert("الرجاء ملء جميع الحقول"); return; }
+  const order = {
+    name, city, address, phone,
+    products: cart,
+    total: cart.reduce((sum,i)=>sum+i.qty*parseInt(i.price.replace(/,/g,"").replace(" ل.س","")),0)
+  };
+  tg.sendData(JSON.stringify(order));
+  alert("✅ تم إرسال الطلب!");
+  cart=[]; updateCartCount(); renderProducts();
+  toggleCheckout();
+}
+
+// تهيئة
+renderProducts();
