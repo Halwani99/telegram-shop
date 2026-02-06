@@ -1,10 +1,15 @@
-body { font-family: Arial, sans-serif; background:#f3f3f3; padding:20px; }
-h1 { color:#673AB7; text-align:center; }
-h2,h3 { color:#333; }
-.category-btn, .product button, #cart button {
-    background:#673AB7; color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; margin:3px;
-}
-.category-btn:hover, .product button:hover, #cart button:hover { opacity:0.9; }
-.product { background:#fff; padding:10px; margin:10px 0; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-#cart { margin-top:20px; padding:10px; background:#fff; border-radius:8px; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-input { display:block; margin:5px 0; padding:8px; width:100%; border-radius:5px; border:1px solid #ccc; }
+body { font-family: Arial, sans-serif; background:#f8f8f8; margin:0; padding:10px; }
+header { display:flex; justify-content:space-between; align-items:center; padding:10px; background:#673AB7; color:#fff; border-radius:8px; }
+#cart-icon { cursor:pointer; font-size:24px; position:relative; }
+#cart-count { background:#FF5722; border-radius:50%; padding:2px 6px; position:absolute; top:-8px; right:-8px; font-size:14px; }
+#search-bar input { width:100%; padding:10px; margin:10px 0; border-radius:8px; border:1px solid #ccc; }
+.product { background:#fff; margin:10px 0; padding:10px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); display:flex; flex-direction:column; align-items:center; }
+.product img { width:100%; border-radius:8px; }
+.product button { background:#673AB7; color:#fff; border:none; border-radius:5px; padding:8px 12px; margin:5px; cursor:pointer; }
+.product button:hover { opacity:0.9; }
+#cart-overlay, #checkout-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); color:#fff; overflow:auto; padding:20px; box-sizing:border-box; }
+#cart-overlay h2, #checkout-overlay h2 { color:#FFEB3B; text-align:center; }
+#cart-items div { display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #fff; }
+#cart-items div button { background:#FF5722; margin:0; }
+#checkout-overlay input, #checkout-overlay select { width:100%; padding:10px; margin:5px 0; border-radius:5px; border:none; }
+#checkout-overlay button { background:#4CAF50; margin:5px 0; padding:10px; border:none; border-radius:5px; cursor:pointer; width:100%; font-size:16px; }
