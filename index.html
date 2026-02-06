@@ -8,22 +8,43 @@
 </head>
 <body>
 
-<h1>🛍 Mays Accessories</h1>
+<header>
+  <h1>🛍 Mays Accessories</h1>
+  <div id="cart-icon" onclick="toggleCart()">🛒 <span id="cart-count">0</span></div>
+</header>
 
-<div id="categories"></div>
+<div id="search-bar">
+  <input type="text" id="search" placeholder="ابحث عن منتج..." oninput="filterProducts()">
+</div>
 
 <div id="products-container"></div>
 
-<div id="cart">
-<h2>سلتك</h2>
-<div id="cart-items"></div>
-<p id="total">المجموع: 0 ل.س</p>
+<div id="cart-overlay" style="display:none;">
+  <h2>سلتك</h2>
+  <div id="cart-items"></div>
+  <p id="cart-total">المجموع: 0 ل.س</p>
+  <button onclick="checkout()">إتمام الطلب</button>
+  <button onclick="toggleCart()">إغلاق السلة</button>
+</div>
 
-<h3>بيانات الشحن</h3>
-<input id="name" placeholder="الاسم">
-<input id="phone" placeholder="الهاتف">
-<input id="address" placeholder="العنوان">
-<button onclick="sendOrder()">إرسال الطلب</button>
+<div id="checkout-overlay" style="display:none;">
+  <h2>بيانات الشحن</h2>
+  <input id="name" placeholder="الاسم">
+  <select id="city">
+    <option value="">اختر المدينة</option>
+    <option value="دمشق">دمشق</option>
+    <option value="حلب">حلب</option>
+    <option value="حمص">حمص</option>
+    <option value="حماة">حماة</option>
+    <option value="اللاذقية">اللاذقية</option>
+    <option value="طرطوس">طرطوس</option>
+    <option value="درعا">درعا</option>
+    <option value="ريف دمشق">ريف دمشق</option>
+  </select>
+  <input id="address" placeholder="العنوان">
+  <input id="phone" placeholder="رقم الهاتف">
+  <button onclick="sendOrder()">إرسال الطلب</button>
+  <button onclick="toggleCheckout()">إغلاق</button>
 </div>
 
 <script src="script.js"></script>
