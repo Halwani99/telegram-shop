@@ -1,109 +1,63 @@
-let cart = JSON.parse(localStorage.getItem("cart")) || [];
+const tg = window.Telegram.WebApp;
 
-// تحميل البيانات
-fetch("data.json")
-  .then(res => res.json())
-  .then(data => {
-    renderCategories(data);
-    renderProducts(data);
-  });
+const products = [
+  {id:1, name:"خاتم فاخر", price:"100,000 ل.س", category:"خواتم", image:"https://via.placeholder.com/150"},
+  {id:2, name:"سوار نسائي", price:"50,000 ل.س", category:"أسوار", image:"https://via.placeholder.com/150"},
+  {id:3, name:"عقد أسود", price:"75,000 ل.س", category:"سلاسل", image:"https://via.placeholder.com/150"},
+  {id:4, name:"ساعة أنيقة", price:"200,000 ل.س", category:"ساعات", image:"https://via.placeholder.com/150"},
+  {id:5, name:"خاتم ماسي", price:"150,000 ل.س", category:"خواتم", image:"https://via.placeholder.com/150"}
+];
 
-/* =====================
-   عرض الفئات
-===================== */
-function renderCategories(data) {
+const cart = [];
+
+const categories = [...new Set(products.map(p=>p.category))];
+
+function renderCategories() {
   const container = document.getElementById("categories");
-  if (!container) return;
-
-  data.categories.forEach(cat => {
-    container.innerHTML += `
-      <div class="card" onclick="openCategory('${cat.id}', '${cat.name}')">
-        <h3>${cat.name}</h3>
-      </div>
-    `;
-  });
+  container.innerHTML = categories.map(c=>`<button class="category-btn" onclick="showProducts('${c}')">${c}</button>`).join("");
 }
 
-function openCategory(id, name) {
-  localStorage.setItem("currentCategory", JSON.stringify({ id, name }));
-  window.location.href = "category.html";
+function showProducts(category) {
+  const container = document.getElementById("products-container");
+  const filtered = products.filter(p=>p.category===category);
+  container.innerHTML = filtered.map(p=>`
+    <div class="product">
+      <img src="${p.image}" width="100%" />
+      <strong>${p.name}</strong><br>
+      السعر: ${p.price}<br>
+      <button onclick="addToCart(${p.id})">أضف للسلة</button>
+    </div>
+  `).join("");
 }
 
-/* =====================
-   عرض المنتجات حسب الفئة
-===================== */
-function renderProducts(data) {
-  const container = document.getElementById("products");
-  if (!container) return;
-
-  const cat = JSON.parse(localStorage.getItem("currentCategory"));
-  document.getElementById("catTitle").innerText = cat.name;
-
-  data.products
-    .filter(p => p.category === cat.id)
-    .forEach(p => {
-      const itemInCart = cart.find(i => i.id === p.id);
-      const qty = itemInCart ? itemInCart.qty : 0;
-
-      container.innerHTML += `
-        <div class="card">
-          <img src="${p.image}">
-          <h4>${p.name}</h4>
-          <p>${p.price}$</p>
-
-          <div class="qty">
-            <button onclick="changeQty(${p.id}, '${p.name}', ${p.price}, -1)">−</button>
-            <span>${qty}</span>
-            <button onclick="changeQty(${p.id}, '${p.name}', ${p.price}, 1)">+</button>
-          </div>
-        </div>
-      `;
-    });
+function addToCart(id) {
+  const product = products.find(p=>p.id===id);
+  cart.push(product);
+  renderCart();
 }
 
-/* =====================
-   السلة (إضافة / إزالة)
-===================== */
-function changeQty(id, name, price, delta) {
-  const item = cart.find(i => i.id === id);
-
-  if (item) {
-    item.qty += delta;
-    if (item.qty <= 0) {
-      cart = cart.filter(i => i.id !== id);
-    }
-  } else if (delta > 0) {
-    cart.push({ id, name, price, qty: 1 });
-  }
-
-  localStorage.setItem("cart", JSON.stringify(cart));
-  location.reload();
+function renderCart() {
+  const container = document.getElementById("cart-items");
+  container.innerHTML = cart.map(p=>`${p.name} - ${p.price}`).join("<br>");
+  const total = cart.reduce((sum,p)=>sum+parseInt(p.price.replace(/,/g,"").replace(" ل.س","")),0);
+  document.getElementById("total").innerText = `المجموع: ${total.toLocaleString()} ل.س`;
 }
 
-/* =====================
-   إرسال الطلب
-===================== */
-function submitOrder() {
-  if (cart.length === 0) {
-    alert("السلة فارغة");
-    return;
-  }
-
-  const order = {
-    name: document.getElementById("name").value,
+function sendOrder() {
+  if(cart.length===0) { alert("⚠️ السلة فارغة!"); return; }
+  const orderData = {
+    user_name: document.getElementById("name").value,
     phone: document.getElementById("phone").value,
-    city: document.getElementById("city").value,
     address: document.getElementById("address").value,
-    items: cart,
-    total: cart.reduce((s, i) => s + i.price * i.qty, 0)
+    products: cart,
+    total: cart.reduce((sum,p)=>sum+parseInt(p.price.replace(/,/g,"").replace(" ل.س","")),0)
   };
-
-  // Telegram Mini App
-  if (window.Telegram?.WebApp) {
-    Telegram.WebApp.sendData(JSON.stringify(order));
-  } else {
-    alert(JSON.stringify(order, null, 2));
-  }
-
-  localStorage.removeItem("cart");
+  tg.sendData(JSON.stringify(orderData));
+  alert("✅ تم إرسال الطلب!");
+  cart.length=0; renderCart();
+  document.getElementById("name").value=""; document.getElementById("phone").value=""; document.getElementById("address").value="";
 }
+
+// تهيئة الصفحة
+renderCategories();
+showProducts(categories[0]);
