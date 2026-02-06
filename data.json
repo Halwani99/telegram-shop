@@ -1,0 +1,24 @@
+{
+  "categories": [
+    { "id": "earrings", "name": "أحلاق" },
+    { "id": "necklaces", "name": "سلاسل" },
+    { "id": "rings", "name": "خواتم" },
+    { "id": "watches", "name": "ساعات" }
+  ],
+  "products": [
+    {
+      "id": 1,
+      "category": "earrings",
+      "name": "حلق ذهبي ناعم",
+      "price": 15,
+      "image": "https://via.placeholder.com/400"
+    },
+    {
+      "id": 2,
+      "category": "rings",
+      "name": "خاتم أنيق",
+      "price": 20,
+      "image": "https://via.placeholder.com/400"
+    }
+  ]
+}
